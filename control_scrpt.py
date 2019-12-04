@@ -47,13 +47,13 @@ def create_config(path_config):
     config.set("data_name", "name", "")
     config.set("data_name", "path_to_dataset", "")
     config.set("data_name", "script_to_convert", "")
-    config.set("data_name", "enabled", "True")
+    config.set("data_name", "enabled", "true")
 
-    config.add_section("image-transform")
-    config.set("image-transform", "script_to_transform", "")
+    config.add_section("image_transform")
+    config.set("image_transform", "script_to_transform", "")
 
-    config.add_section("tuning-image")
-    config.set("tuning-image", "script_to_tuning", "")
+    config.add_section("tuning_image")
+    config.set("tuning_image", "script_to_tuning", "")
 
     config.add_section("records")
     config.set("records", "script_to_create_tf_records", "")
@@ -199,7 +199,7 @@ if __name__ == "__main__":
                 error_message(4, 'transform', '', '')
         
         print(colored(" - Image Transform - ", 'blue'))
-        script = config.get('image-transform', 'script_to_transform')
+        script = config.get('image_transform', 'script_to_transform')
         data_dir = replace_string(config.get("datasets", 'output_path'))
         if os.path.exists(script) or script == "":
             if script != "":
@@ -215,7 +215,7 @@ if __name__ == "__main__":
             error_message(1, script, 'script_to_transform', 'image-transform')  # ERROR
 
         print(colored(" - Tuning Image - ", 'blue'))
-        script = config.get('tuning-image', 'script_to_tuning')
+        script = config.get('tuning_image', 'script_to_tuning')
         data_dir = replace_string(config.get("datasets", 'output_path'))
         if os.path.exists(script) or script == "":
             if script != "":
