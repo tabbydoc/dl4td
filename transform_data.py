@@ -26,7 +26,7 @@ def transform(input_folder, output_folder, folder_ann, folder_img, display_mode)
     trainval_path = os.path.join(output_folder, 'annotations')
     img_folder = os.path.join(output_folder, 'images')
 
-    f = open(trainval_path + _slash + 'trainval.txt', 'w')
+    _file = open(trainval_path + _slash + 'trainval.txt', 'w')
 
     for xml_file in files:
         if xml_file.endswith('.xml'):
@@ -34,39 +34,28 @@ def transform(input_folder, output_folder, folder_ann, folder_img, display_mode)
             ann_path_in = os.path.join(input_folder, folder_ann + _slash + xml_file)
             ann_path_out = os.path.join(xml_folder, xml_file)
             file_name = xml_file[:-4]
-            f.write(str(file_name) + '\n')
+            _file.write(str(file_name) + '\n')
 
             img_path_in = os.path.join(input_folder, folder_img + _slash + file_name + '.jpeg')
             img_path_out = os.path.join(img_folder, file_name + '.jpeg')
             shutil.copyfile(ann_path_in, ann_path_out)
             shutil.copyfile(img_path_in, img_path_out)
-
-    print("copying completed! \n Number of files:" + str(count_files))
-    f.close()
+    print("Copying completed! \n Number of files:" + str(count_files))
+    _file.close()
 
 
 
 def move_files(in_path, _debug, xmls_path, images_path):
-
-    # files = os.listdir(in_path + "+ _slash +annotations+ _slash +xmls")
     files = os.listdir(os.path.join(in_path, 'annotations' + _slash + 'xmls'))
     for xml_file in files:
         if xml_file.endswith('.xml'):
             ann_path_in = os.path.join(in_path + _slash + 'annotations' + _slash + 'xmls' + _slash, xml_file)
-            if _debug == 1:
-                print(colored("-file xml input - " + ann_path_in, 'green'))
             ann_path_out = os.path.join(xmls_path, xml_file)
-            if _debug == 1:
-                print(colored("-file xml output - " + ann_path_out, 'green'))
             file_name = xml_file[:-4]
             if os.path.exists(ann_path_out):
-                if _debug == 1:
-                    print(colored("-file exist! Run copy proc", 'green'))
                 global _copy_suffix
                 new_filename = file_name + '_' + str(_copy_suffix)
                 ann_path_out = os.path.join(xmls_path, new_filename + '.xml')
-                if _debug == 1:
-                    print(colored("-New xml path - " + ann_path_out, 'green'))
                 shutil.copyfile(ann_path_in, ann_path_out)
 
                 xml_tree = ET.parse(ann_path_out)
@@ -94,7 +83,7 @@ def delete_excess(in_path):
             new_xml_tree = copy.deepcopy(xml_tree)
             filename_img = new_xml_tree.find('object')
             if filename_img is None:
-                print('delete file - ' + str(xml_file))
+                print('Delete file - ' + str(xml_file))
                 os.remove(os.path.join(in_path  + _slash + 'annotations' + _slash + 'xmls', xml_file))
                 file_name = xml_file[:-4]
                 img = os.path.join(in_path  + _slash + 'images' + _slash, file_name + '.jpeg')
