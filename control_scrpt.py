@@ -10,10 +10,10 @@ import sys
 import re
 
 try:
-    from transformdatamodule import *
+    from transform_data import *
 except ImportError:
     sys.path.insert(1, os.path.curdir)
-    from transformdatamodule import *
+    from transform_data import *
 
 _debug = 0
 _copy_suffix = 1
