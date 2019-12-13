@@ -14,24 +14,25 @@ The *augmentation_data* is script for augmentation data
 *Config.ini* file is divided into sections. The first section is ‘‘datasets’’. 
 ```ini
     [datasets]
-    output_path = 
-    local_path = 
+    output_path = <...>
+    local_path = <...>
 ```
 The *output_path* parameter stores the path where the converted data will be saved. The *local_path* parameter is the path to the directory where the temporary script files will be stored. This parameter is needed if there are several datasets and a script that converts one dataset into another re-creates the directories, thereby deleting the files that were in the *output_path* folder. The converted dataset will be copied to the temporary folder, files that have the same name will be renamed. 
 
 ------------
-The following N sections store parameters for specific datasets.
+The following N sections store parameters for specific datasets, where N is the number of datasets.
+
 ```ini
-    [data_NAME]
-    name = 
-    path_to_dataset = 
-    script_to_convert =
+    [data_name]
+    name = <...>
+    path_to_dataset = <...>
+    script_to_convert = <...>
 ```
-[data\_NAME] is name of section (``NAME'' is the user-defined custom name.).
+[data_name] is name of section (``name'' is the user-defined custom name.).
 Example: 
 ```ini
     [datasets]
-    output_path = data/in
+    output_path = data/out
     local_path = data/local
     
     [data_icdar2017]
@@ -46,7 +47,7 @@ Example:
     script_to_convert = scripts/marmot_to_pascalvoc/main.py
     enabled = true
 ```
-Inside the *data_NAME* section there are three parameters: *name*, *path_to_datasets*, *script_to_convert*. The *name* parameter is needed in order to display a message on the console exactly which data is converted (this parameter is necessary for the convenience of reading logs). The *path_to_datasets* parameter stores the path to dataset. The *script_to_convert* contains the path to the script that converts datasets. The *enabled* parameter indicates whether or not to use this dataset.
+Inside the *data_name* section there are three parameters: *name*, *path_to_datasets*, *script_to_convert*. The *name* parameter is needed in order to display a message on the console exactly which data is converted (this parameter is necessary for the convenience of reading logs). The *path_to_datasets* parameter stores the path to dataset. The *script_to_convert* contains the path to the script that converts datasets. The *enabled* parameter indicates whether or not to use this dataset.
 
 The next section is *image_transform*. This section contains options for image conversion.
 ```ini
@@ -93,9 +94,8 @@ It is also possible to use links to parameters *output_path*, *local_path*. To d
 For example:
 ```ini
     [datasets]
-    output_path = Data/Out
-    local_path = Local/Temp
-    amount_of_datasets = 1
+    output_path = data/out
+    local_path = local/temp
     
     ...
     
