@@ -24,10 +24,7 @@ The *image_transform* is script for serial action. This script is first binarize
 Figure 2:
 ![image_transform example](https://zigorewslike.github.io/sourse/binary_and_distance2.png)
 
-------------
-...
-
-------------
+## Description of *Config.ini* file
 *Config.ini* file is divided into sections. The first section is ‘‘datasets’’. 
 ```ini
     [datasets]
