@@ -5,8 +5,9 @@ The script uses a special file *config.ini*. This file contains the script start
 
 The "scripts" directory contains scripts for convert datasets, image transform, augmentation data, create tf record.
 
-The *augmentation_data* is script for augmentation data
+The *augmentation_data* is script for augmentation data. Augmentation of data occurs due to a change in the width and height of the images. By changing the width and height of the image, you can get 9 times more data. 
 
+![augmentation data example](https://zigorewslike.github.io/sourse/img_tun_transf_big.png)
 
 ...
 
