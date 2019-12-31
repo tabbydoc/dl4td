@@ -7,8 +7,13 @@ The "scripts" directory contains scripts for convert datasets, image transform, 
 
 The *augmentation_data* is script for augmentation data. Augmentation of data occurs due to a change in the width and height of the images. By changing the width and height of the image, you can get 9 times more data. 
 
+Figure 1
 ![augmentation data example](https://zigorewslike.github.io/sourse/img_tun_transf_big.png)
 
+The *image_transform* is serial action. This script is first binarized (see Figure 2 (a)), then the image break down on the RGB channels and the "distanceTransform" function is used (see Figure 2 (b))
+
+Figure 2
+![image_transform example](https://zigorewslike.github.io/sourse/binary_and_distance.png)
 ...
 
 ------------
