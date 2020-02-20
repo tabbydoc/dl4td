@@ -1,4 +1,4 @@
-# dl4td
+# Dl4td
 Dl4td is a collection of scripts for automating data preprocessing. The `control.py` script is the main script.
 
 ## Description of scripts
