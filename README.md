@@ -7,7 +7,7 @@ Python 3.5+ is needed. Install the necessary libraries, namely *subprocess*, *co
 ## How to use
 Then, you need to specify all the parameters in the `config.ini` file and run `control.py` script. 
 
-## Description of *Config.ini* file
+### Setup *Config.ini* file
 *Config.ini* file is divided into sections. The first section is ‘‘datasets’’. 
 ```ini
     [datasets]
