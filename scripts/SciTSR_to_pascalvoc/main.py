@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw
-import re
+import random
 
 import json
 
@@ -26,6 +26,8 @@ for chunk in chunks:
     print(chunk["pos"][1])
     print(chunk["pos"][2])
     print(chunk["pos"][3])
+    clr = random.randrange(000000, 256)
+    img1.rectangle([chunk["pos"][0], h-chunk["pos"][2], chunk["pos"][1], h-chunk["pos"][3]], fill=clr)
     print("")
     if minx > chunk["pos"][0]:
         minx = chunk["pos"][0]
@@ -38,7 +40,7 @@ for chunk in chunks:
         maxy = chunk["pos"][3]
 print(minx, miny, maxx, maxy)
 
-img1.rectangle([minx, miny, maxx, maxy], fill ="#ffff33", outline ="red")
+img1.rectangle([minx, miny, maxx, maxy], outline="green")
 
 img.show()
 
