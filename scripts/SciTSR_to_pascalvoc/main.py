@@ -7,18 +7,12 @@ import codecs
 from pylatexenc.latex2text import LatexNodes2Text
 import re
 from datetime import datetime
+from xml.etree.ElementTree import ElementTree
+import xml.etree.ElementTree as ET
+import shutil
 import time
 
 import json
-
-
-def b(text):
-    for ch in ['\\', '`', '*', '+', '{', '}', '[', ']', '(', ')', '>', '#', '+', '-', '.', '!', '$', '\'', '?', '^',
-               '|', ',']:
-        if ch in text:
-            text = text.replace(ch, "\\" + ch)
-    return text
-
 
 def delete_exc_char(text):
     for ch in ['_', ' ', ' ', '^', '\n', '*', '\'', '\\', '`', '\t']:
@@ -31,16 +25,39 @@ w, h = 595, 842
 w_img, h_img = 1654, 2339
 # shape = [(10, 10), (w - 10, h - 10)]
 work_directory = "D:\\Projects\\PyCharm\\Sctisr\\data\\SciTSR"
-work_directory_pdf = os.path.join(work_directory, 'train', 'pdf')
+work_directory_pdf = os.path.join(work_directory, 'train', 'Test')
 work_directory_chunk = os.path.join(work_directory, 'train', 'chunk')
 work_directory_structure = os.path.join(work_directory, 'train', 'structure')
-data_out = "D:\\Projects\\PyCharm\\Sctisr\\data\\LOCAL5"
+data_out = "D:\\Projects\\PyCharm\\Sctisr\\data\\LOCAL"
+
+annotation_out = os.path.join(data_out, "annotations")
+annotation_xml_out = os.path.join(annotation_out, "xml")
+image_out = os.path.join(data_out, "images")
+
+if os.path.exists(annotation_out):
+    shutil.rmtree(annotation_out)
+if os.path.exists(annotation_xml_out):
+    shutil.rmtree(annotation_xml_out)
+if os.path.exists(image_out):
+    shutil.rmtree(image_out)
+
+os.makedirs(annotation_out)
+os.makedirs(image_out)
+os.makedirs(annotation_xml_out)
+
+trainval = open(annotation_out + os.sep + 'trainval.txt', 'w')
 
 skip_file_list = ['']
 
 max_step = 15000
 step = 0
 shift = 14
+# min_step = 11990
+min_step = 0
+
+debug = True
+_noImage = True
+
 
 texx = 'γ ∗  \nb (dB) bf b (γ ∗  \nb )/γ ∗  \nb'
 texx = delete_exc_char(texx).encode('ascii', errors='ignore')
@@ -53,9 +70,6 @@ if tex == texx:
     print('y')
 else:
     print('no')
-debug = True
-min_step = 11990
-# min_step = 0
 
 start_time = datetime.now()
 ignore_list = []
@@ -77,15 +91,18 @@ for root, dirs, files in os.walk(work_directory_pdf):
         print(file)
         pages[0].save(data_out + "\\images\\" + file[:-4] + ".jpeg", 'JPEG')
 
-        image = os.path.join(data_out, "images", file[:-4] + ".jpeg")
-        print(image)
-        img = Image.open(image)
+        if not _noImage:
+            image = os.path.join(data_out, "images", file[:-4] + ".jpeg")
+            print(image)
+            img = Image.open(image)
 
-        img1 = ImageDraw.Draw(img)
+            img1 = ImageDraw.Draw(img)
         chun = codecs.open(work_directory_chunk + '\\' + file[:-4] + '.chunk', 'r', encoding='utf-8')
         struct = codecs.open(work_directory_structure + '\\' + file[:-4] + '.json', 'r', encoding='utf-8')
 
-        log = open('D:\\Projects\\PyCharm\\Sctisr\\data\\logs_v5\\' + file[:-4] + '.txt', 'w')
+        trainval.write(str(file[:-4]) + '\n')
+
+        log = open('D:\\Projects\\PyCharm\\Sctisr\\data\\logs_test\\' + file[:-4] + '.txt', 'w')
         log.write(file + '\n')
         minx = w_img
         miny = h_img
@@ -113,6 +130,19 @@ for root, dirs, files in os.walk(work_directory_pdf):
                     ignore_list.pop(i)
                     break
 
+        rootTree = ET.Element('annotation')
+        filename = ET.SubElement(rootTree, "filename")
+        filename.text = str(file[:-3]) + "jpg"
+        size = ET.SubElement(rootTree, "size")
+        width = ET.SubElement(size, "width")
+        width.text = str(w_img)
+        height = ET.SubElement(size, "height")
+        height.text = str(h_img)
+        depth = ET.SubElement(size, "depth")
+        depth.text = str(3)
+        segmented = ET.SubElement(rootTree, "segmented")
+        segmented.text = str(0)
+
         for chunk in chunks:
             if debug:
                 log.write(str(chunk["pos"][0]) + '\n')
@@ -127,10 +157,12 @@ for root, dirs, files in os.walk(work_directory_pdf):
                 print(chunk["pos"][3])
                 print(LatexNodes2Text().latex_to_text(chunk["text"]))
                 """
-            clr = random.randrange(0, 256)
-            img1.rectangle(
-                [chunk["pos"][0] * (w_img / w), h_img - chunk["pos"][2] * (h_img / h), chunk["pos"][1] * (w_img / w),
-                 h_img - chunk["pos"][3] * (h_img / h)], outline=clr)
+            if not _noImage:
+                clr = random.randrange(0, 256)
+
+                img1.rectangle(
+                    [chunk["pos"][0] * (w_img / w), h_img - chunk["pos"][2] * (h_img / h), chunk["pos"][1] * (w_img / w),
+                     h_img - chunk["pos"][3] * (h_img / h)], outline=clr)
             # print("")
 
             find = False
@@ -213,12 +245,29 @@ for root, dirs, files in os.walk(work_directory_pdf):
               h_img - maxy * (h_img / h))
         print('STEP: ', step)
 
-        img1.rectangle([minx * (w_img / w) - shift, h_img - miny * (h_img / h) + shift, maxx * (w_img / w) + shift,
-                        h_img - maxy * (h_img / h) - shift], outline="green", width=7)
+        object = ET.SubElement(rootTree, "object")
+        name = ET.SubElement(object, "name")
+        name.text = "table"
+        bndbox = ET.SubElement(object, "bndbox")
+        xmin = ET.SubElement(bndbox, "xmin")
+        xmin.text = str(int(minx * (w_img / w) - shift))
+        ymin = ET.SubElement(bndbox, "ymin")
+        ymin.text = str(int(h_img - maxy * (h_img / h) - shift))
+        xmax = ET.SubElement(bndbox, "xmax")
+        xmax.text = str(int(maxx * (w_img / w) + shift))
+        ymax = ET.SubElement(bndbox, "ymax")
+        ymax.text = str(int(h_img - miny * (h_img / h) + shift))
+
+        ElementTree(rootTree).write(open(os.path.join(annotation_xml_out, file[:-3] + "xml"), 'w'), encoding='unicode')
+
+        if not _noImage:
+            img1.rectangle([minx * (w_img / w) - shift, h_img - miny * (h_img / h) + shift, maxx * (w_img / w) + shift,
+                            h_img - maxy * (h_img / h) - shift], outline="green", width=7)
         # img.show()
         chun.close()
         struct.close()
-        img.save(data_out + "\\annotations\\" + file[:-4] + ".jpeg")
+        if not _noImage:
+            img.save(data_out + "\\annotations\\" + file[:-4] + ".jpeg")
 
         if debug:
             # print('')
@@ -229,7 +278,5 @@ for root, dirs, files in os.walk(work_directory_pdf):
     if step >= max_step:
         break
 
+trainval.close()
 print('= ВРЕМЯ РАБОТЫ : ', datetime.now() - start_time)
-
-sys.exit(0)
-
