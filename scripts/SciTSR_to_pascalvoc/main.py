@@ -31,7 +31,7 @@ work_directory_structure = os.path.join(work_directory, 'train', 'structure')
 data_out = "D:\\Projects\\PyCharm\\Sctisr\\data\\LOCAL"
 
 annotation_out = os.path.join(data_out, "annotations")
-annotation_xml_out = os.path.join(annotation_out, "xml")
+annotation_xml_out = os.path.join(annotation_out, "xmls")
 image_out = os.path.join(data_out, "images")
 
 if os.path.exists(annotation_out):
