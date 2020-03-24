@@ -229,7 +229,7 @@ if __name__ == "__main__":
                 _skip_tun = 1
         else:
             error_message(1, script, 'script_to_tuning', 'tuning-image')  # ERROR
-        if _skip_tun != 1 and _skip_transform != 1:
+        if _skip_tun != 1:
 
             if os.path.exists(os.path.join(output_dir, 'images')):
                 shutil.rmtree(os.path.join(output_dir, 'images'))
