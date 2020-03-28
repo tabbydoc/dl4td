@@ -30,7 +30,7 @@ for opt, arg in opts:
         output_path = arg
 
 annotation_out = os.path.join(output_path, "annotations")
-annotation_xml_out = os.path.join(annotation_out, "xml")
+annotation_xml_out = os.path.join(annotation_out, "xmls")
 image_out = os.path.join(output_path, "images")
 
 if os.path.exists(annotation_out):
