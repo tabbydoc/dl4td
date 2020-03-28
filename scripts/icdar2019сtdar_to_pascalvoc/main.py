@@ -55,7 +55,7 @@ for root, dirs, files in os.walk(input_path):
         if not skip:
             with Image.open(path_to_file) as img:
                 width, height = img.size
-                img.save(os.path.join(image_out, filesimg))
+                img.save(os.path.join(image_out, filesimg[:-2]+'peg'))
                 images[filesimg[:-4]] = {"width": width, "height": height}
     for files in fnmatch.filter(files, "*.xml"):
         print(files)
