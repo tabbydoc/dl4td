@@ -133,16 +133,16 @@ if __name__ == "__main__":
         xmls_path = os.path.join(annotations_path, "xmls")
         images_path = os.path.join(local_dir, "images")
 
-        if os.path.exists(annotations_path):
-            shutil.rmtree(annotations_path)
-        if os.path.exists(images_path):
-            shutil.rmtree(images_path)
-        if os.path.exists(xmls_path):
-            shutil.rmtree(xmls_path)
-
-        os.makedirs(images_path)
-        os.makedirs(annotations_path)
-        os.makedirs(xmls_path)
+        # if os.path.exists(annotations_path):
+        #     shutil.rmtree(annotations_path)
+        # if os.path.exists(images_path):
+        #     shutil.rmtree(images_path)
+        # if os.path.exists(xmls_path):
+        #     shutil.rmtree(xmls_path)
+        #
+        # os.makedirs(images_path)
+        # os.makedirs(annotations_path)
+        # os.makedirs(xmls_path)
 
         if not os.path.exists(os.path.join(output_dir, "annotations")):
             os.mkdir(os.path.join(output_dir, "annotations"))
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         dataset_list = []
         for line in open(path, 'r'):
             res = re.findall(r"\[data_\w+", line)
-            if res:
+            if res and config.get(res[0][1:], "enabled").upper() == "TRUE":
                 dataset_list.append(res[0][1:])
 
         for dataset_name in dataset_list:
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                         if code != 0:
                             error_message(3, script, code, '')
                     else:
-                        print(colored(' -Skip-', 'yellow') + '\n')
+                        print(colored(' -Skip (script_to_convert is empty)-', 'yellow') + '\n')
                         _skip_data += 1
                         print(os.path.exists(data_dir  + _slash + 'annotations' + _slash + 'xmls'))
 
@@ -186,9 +186,10 @@ if __name__ == "__main__":
                 else:
                     error_message(1, script, 'script_to_convert. Enabled = false', dataset_name)  # ERROR
                 if len(dataset_list) > 1:
+                    print(dataset_list)
                     move_files(output_dir, _debug, xmls_path, images_path)
             else:
-                print(colored(' -Skip-', 'yellow') + '\n')
+                print(colored(' -Skip (enabled = false)-', 'yellow') + '\n')
         if len(dataset_list) > 1:
             shutil.rmtree(output_dir  + _slash + 'annotations')
             shutil.rmtree(output_dir  + _slash + 'images')
@@ -238,7 +239,8 @@ if __name__ == "__main__":
 
             print(colored(' - Some data conversions -', 'blue'))
             try:
-                transform(data_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
+                transform(local_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
+                # move_files(local_dir, _debug, xmls_path, images_path)
             except RuntimeError:
                 error_message(4, 'transform', '', '')
 
