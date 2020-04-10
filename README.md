@@ -28,7 +28,11 @@ Figure 2:
 
 
 ## Installation
-Python 3.5+ is needed. Install the necessary libraries, namely *subprocess*, *configparser*, *termcolor*. 
+Python 3.5+ is needed. Install the necessary libraries.
+
+```python
+pip install -r requirements.txt
+```
 
 ## How to use
 Then, you need to specify all the parameters in the `config.ini` file and run `control.py` script. 
