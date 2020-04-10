@@ -1,31 +1,40 @@
-# dl4td
+# Dl4td
+Dl4td is a collection of scripts for automating data preprocessing. The `control.py` script is the main script.
+
 ## Description of scripts
-The *control_script.py* script is script to automate data preparation for training ANN models
-The script uses a special file *config.ini*. This file contains the script start-up parameters. This is necessary to simplify the launch of the script.
+The `control_script.py` script is script to automate data preparation for training ANN models
+The script uses a special file `config.ini`. This file contains the script start-up parameters. This is necessary to simplify the launch of the script.
 
 The "scripts" directory contains scripts for conversion datasets, image transform, augmentation data, create tf record.
 
-The *icdar2017_to_pascalvoc* is script for conversion ICDAR2017 dataset to PASCALVOC dataset.  
+The `icdar2017_to_pascalvoc` is script for conversion ICDAR2017 dataset to PASCALVOC dataset.  
  
-The *icdar2019сtdar_to_pascalvoc* is script for conversion ICDAR2019cTDaR dataset to PASCALVOC dataset.
+The `icdar2019сtdar_to_pascalvoc` is script for conversion ICDAR2019cTDaR dataset to PASCALVOC dataset.
 
-The *marmot_to_pascalvoc* is script for conversion Marmot dataset to PASCALVOC dataset.
+The `marmot_to_pascalvoc` is script for conversion Marmot dataset to PASCALVOC dataset.
 
-The *unlv_to_pascalvoc* is script for conversion UNLV dataset to PASCALVOC dataset.
+The `unlv_to_pascalvoc` is script for conversion UNLV dataset to PASCALVOC dataset.
 
-The *augmentation_data* is script for augmentation data. Augmentation of data occurs due to a change in the width and height of the images. By changing the width and height of the image, you can get 9 times more data. 
+The `augmentation_data` is script for augmentation data. Augmentation of data occurs due to a change in the width and height of the images. By changing the width and height of the image, you can get 9 times more data. 
 
 Figure 1:
 ![augmentation data example](https://zigorewslike.github.io/sourse/img_tun_transf_big.png)
 
 ------------
-The *image_transform* is script for serial action. This script is first binarized (see Figure 2 (a)), then the image break down on the RGB channels and the "distanceTransform" function is used (see Figure 2 (b))
+The `image_transform` is script for serial action. This script is first binarized (see Figure 2 (a)), then the image break down on the RGB channels and the "distanceTransform" function is used (see Figure 2 (b))
 
 Figure 2:
 ![image_transform example](https://zigorewslike.github.io/sourse/binary_and_distance2.png)
 
-## Description of *Config.ini* file
-*Config.ini* file is divided into sections. The first section is ‘‘datasets’’. 
+
+## Installation
+Python 3.5+ is needed. Install the necessary libraries, namely *subprocess*, *configparser*, *termcolor*. 
+
+## How to use
+Then, you need to specify all the parameters in the `config.ini` file and run `control.py` script. 
+
+### Setup *Config.ini* file
+`Config.ini` file is divided into sections. The first section is ‘‘datasets’’. 
 ```ini
     [datasets]
     output_path = <...>
