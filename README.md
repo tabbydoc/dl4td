@@ -1,5 +1,5 @@
-# Dl4td
-Dl4td is a collection of scripts for automating data preprocessing. The `control.py` script is the main script.
+# DL4TD
+These scripts help to create DNN-models for table detection in image documents. They aim at reducing user efforts needed for DL preparation and configuration.
 
 ## Description of scripts
 The `control_script.py` script is script to automate data preparation for training ANN models
