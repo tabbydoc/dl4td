@@ -275,13 +275,9 @@ if __name__ == "__main__":
 
         print(colored(" - Create tfRecords - ", 'blue'))
         script = config.get('records', 'script_to_create_tf_records')
-        data_dir = config.get('datasets', 'output_path')
-        data_dir = data_dir.replace('\\r', '\\\\r')
-        output_path = config.get('records', 'path_to_output')
-        output_path = output_path.replace('\\r', '\\\\r')
-        print(output_path)
-        label_map_path = config.get('records', 'path_to_label_map')
-        label_map_path = label_map_path.replace('\\r', '\\\\r')
+        data_dir = os.path.abspath(config.get('datasets', 'output_path'))
+        output_path = os.path.abspath(config.get('records', 'path_to_output'))
+        label_map_path = os.path.abspath(config.get('records', 'path_to_label_map'))
         if os.path.exists(script) or script == "":
             if script != "":
                 print(colored('Running script', 'blue'), colored(script, 'blue', attrs=['underline']) + '\n',
