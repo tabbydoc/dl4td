@@ -83,18 +83,6 @@ shift = 14
 # min_step = 11990
 min_step = 0
 
-texx = 'γ ∗  \nb (dB) bf b (γ ∗  \nb )/γ ∗  \nb'
-texx = delete_exc_char(texx).encode('ascii', errors='ignore')
-print(texx)
-tex = LatexNodes2Text().latex_to_text('$b f_b(\\gamma_b^*)/ \\gamma_b^*$').replace('_', '')
-tex = delete_exc_char(tex).encode('ascii', errors='ignore')
-# tex = 'Ω(n2logn)'.encode('ascii', errors='ignore')
-print(str(tex).replace(' ', ''))
-if tex == texx:
-    print('y')
-else:
-    print('no')
-
 start_time = datetime.now()
 ignore_list = []
 
