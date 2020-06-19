@@ -2,7 +2,7 @@
 These scripts help to create DNN-models for table detection in image documents. They aim at reducing user efforts needed for DL preparation and configuration.
 
 ## Description of scripts
-The `control_script.py` script is script to automate data preparation for training ANN models
+The `main.py` is script to automate data preparation for training ANN models
 The script uses a special file `config.ini`. This file contains the script start-up parameters. This is necessary to simplify the launch of the script.
 
 The "scripts" directory contains scripts for conversion datasets, image transform, augmentation data, create tf record.
