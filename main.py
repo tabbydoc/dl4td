@@ -32,6 +32,7 @@ except IndexError:
     print('-r')
 
 
+# Function to create a config.ini file
 def create_config(path_config):
     """
     Create a config file
@@ -66,6 +67,7 @@ def create_config(path_config):
         print(colored(" File " + path_config + " was created!", "blue"))
 
 
+# Replacing the words {output_path} and {local_path} with the appropriate path.
 def replace_string(str):
     if re.findall(regex_out, str):
         return re.sub(regex_out, output_dir, str, count=0)
@@ -75,6 +77,7 @@ def replace_string(str):
         return str
 
 
+# Error call function
 def error_message(error_type, text, text2, text3):
     if error_type == 0:
         print(colored('ERROR! File ' + text + ' not found!', 'red', attrs=['reverse', 'bold']))
@@ -113,6 +116,7 @@ if __name__ == "__main__":
         error_message(0, path, '', '')  # ERROR
         create_config(path)
     else:
+        # Reading parameters from a file and preparing the output directory.
         config = configparser.ConfigParser()
         config.read(path)
         if config.get("settings", 'train').upper() == 'NO':
@@ -164,12 +168,14 @@ if __name__ == "__main__":
                                                                          "xmls") + ' -> ' + str(
                 os.path.exists(os.path.join(os.path.join(output_dir, "annotations"), "xmls"))), 'yellow'))
 
+        # Read all datasets from the config.ini file
         dataset_list = []
         for line in open(path, 'r'):
             res = re.findall(r"\[data_\w+", line)
             if res and config.get(res[0][1:], "enabled").upper() == "TRUE":
                 dataset_list.append(res[0][1:])
 
+        # Run dataset conversion
         for dataset_name in dataset_list:
             print(colored("= " + config.get(dataset_name, 'name') + " =", 'blue'))
             _skip_this = 0
@@ -225,6 +231,7 @@ if __name__ == "__main__":
             except RuntimeError:
                 error_message(4, 'transform', '', '')
 
+        # Run image transforming
         print(colored(" - Image Transform - ", 'blue'))
         script = config.get('image_transform', 'script_to_transform')
         data_dir = replace_string(config.get("datasets", 'output_path'))
@@ -241,6 +248,7 @@ if __name__ == "__main__":
         else:
             error_message(1, script, 'script_to_transform', 'image-transform')  # ERROR
 
+        # Run data tuning
         print(colored(" - Tuning Image - ", 'blue'))
         script = config.get('tuning_image', 'script_to_tuning')
         data_dir = replace_string(config.get("datasets", 'output_path'))
@@ -273,6 +281,7 @@ if __name__ == "__main__":
         print(colored(' - delete excess data -' + output_dir, 'blue'))
         delete_excess(output_dir)
 
+        # Create TensorFlow record files
         print(colored(" - Create tfRecords - ", 'blue'))
         script = config.get('records', 'script_to_create_tf_records')
         data_dir = os.path.abspath(config.get('datasets', 'output_path'))
