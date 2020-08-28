@@ -99,7 +99,7 @@ def error_message(error_type, text, text2, text3):
         raise SystemExit(1)
     elif error_type == 4:
         print(colored('ERROR! Module  ' + text + ' return -1', 'red', attrs=['reverse', 'bold']))
-        raise SystemExit(1)
+        raise SystemExit(4)
 
 
 if __name__ == "__main__":
