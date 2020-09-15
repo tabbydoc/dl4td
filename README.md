@@ -1,134 +1,184 @@
-# DL4TD
-These scripts help to create DNN-models for table detection in image documents. They aim at reducing user efforts needed for DL preparation and configuration.
+Документация к DL4TD
+======
 
-## Description of scripts
-The `main.py` is script to automate data preparation for training ANN models
-The script uses a special file `config.ini`. This file contains the script start-up parameters. This is necessary to simplify the launch of the script.
+[GitHub - https://github.com/tabbydoc/dl4td](https://github.com/tabbydoc/dl4td)
 
-The "scripts" directory contains scripts for conversion datasets, image transform, augmentation data, create tf record.
+# О проекте
 
-The `icdar2017_to_pascalvoc` is script for conversion ICDAR2017 dataset to PASCALVOC dataset.  
- 
-The `icdar2019сtdar_to_pascalvoc` is script for conversion ICDAR2019cTDaR dataset to PASCALVOC dataset.
+Dl4td - это автоматизированная система для создания и настройки рабочего процесса по подготовки данных для обучения ANN сети на распознавание таблиц в документах через Object Detection. Процесс подготовки данных стостоит из конвертации датасетов в унифицированный формат, преобразования изображений, аугментация методом афинных преобразования данных, некоторая валидация данных и создания входных файлов типа TF Records (train.record - обучающая выборка и val.record - тестовая выборка).  
 
-The `marmot_to_pascalvoc` is script for conversion Marmot dataset to PASCALVOC dataset.
+<!--![WorkFlow](WorkFlow.png)-->
 
-The `unlv_to_pascalvoc` is script for conversion UNLV dataset to PASCALVOC dataset.
+# Инициализация
 
-The `augmentation_data` is script for augmentation data. Augmentation of data occurs due to a change in the width and height of the images. By changing the width and height of the image, you can get 9 times more data. 
+Для работы проекта нужно установить  Python 3.6.X версии. Также установить все необходимы библиотеки, прописав в директории проекта команду:
 
-Figure 1:
-![augmentation data example](https://zigorewslike.github.io/sourse/img_tun_transf_big.png)
-
-------------
-The `image_transform` is script for serial action. This script is first binarized (see Figure 2 (a)), then the image break down on the RGB channels and the "distanceTransform" function is used (see Figure 2 (b))
-
-Figure 2:
-![image_transform example](https://zigorewslike.github.io/sourse/binary_and_distance2.png)
-
-
-## Installation
-Python 3.5+ is needed. Install the necessary libraries.
-
-```python
+```bash
 pip install -r requirements.txt
 ```
 
-## How to use
-Then, you need to specify all the parameters in the `config.ini` file and run `control.py` script. 
+После этого нужно установить на свою машину фреймворк TF Object Detection.
+> Версия TensorFlow должна быть 1.5.x
 
-### Setup *Config.ini* file
-`Config.ini` file is divided into sections. The first section is ‘‘datasets’’. 
+[Установка Object Detection на Windows 10](https://medium.com/@marklabinski/installing-tensorflow-object-detection-api-on-windows-10-7a4eb83e1e7b)
+[Установка OD и некоторых компонентов](https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/install.html#)
+
+# Структура проекта (в GitHub'e)
+
+| Директория/файл  | Описание |
+| ------------------ | ---------- |
+| `scripts/`| В этой папке хранятся все необходимые скрипты для преобразований, аугментации, конвертации датасетов и т.д. |
+| `└─augmentation_data/main.py`| Скрипт выполняющий аугментацию (расширение) данных |
+| `└─create_table_tf_record/create_tf_record.py`| Скрипт преобразовывающий данные из формата PASCAL VOC в формат TF Record (Создаёт два файла: `train.record` и `val.record`)|
+| `└─icdar2017_to_pascalvoc/main.py`| Скрипт выполняющий конвертацию датасета из формата ICDAR2017 в формат PASCAL VOC|
+| `└─icdar2017_to_pascalvoc/data_structure.py`| Вспомогательный модуль, хранящий функции для работы с данными ICDAR2017|
+| `└─icdar2019сtdar_to_pascalvoc/main.py`| Скрипт выполняющий конвертацию датасета из формата ICDAR2019 cTDaR в формат PASCAL VOC|
+| `└─image_transform/main.py`| Скрипт преобразовывающий изображения (бинаризует и применяет функцию DistanceTransform)|
+| `└─marmot_to_pascalvoc/main.py`| Скрипт выполняющий конвертацию датасета из формата Marmot в формат PASCAL VOC|
+| `└─marmot_to_pascalvoc/rect.py`| Вспомогательный модуль, хранящий функции для `marmot_to_pascalvoc/main.py`|
+| `└─scitsr_to_pascalvoc/main.py`| Скрипт выполняющий конвертацию датасета из формата SciTSR в формат PASCAL VOC|
+| `└─scitsr_to_pascalvoc/ignore.list`| Необходимый файл для корректной работы скрипта `scitsr_to_pascalvoc/main.py`|
+| `└─unlv_to_pascalvoc/main.py`| Скрипт выполняющий конвертацию датасета из формата UNLV в формат PASCAL VOC|
+| `config.ini`| Файл со всеми параметрами запуска всего процесса. Этот файл необходим для корректного запуска `main.py` скрипта|
+| `main.py`| Управляющий скрипт. Этот скрипт является главным в проекте. Он поочерёдно запускает другие процессы и контролирует их|
+| `requirements.txt`| Файл с необходимыми библиотеками (для pip install)|
+| `transform_data.py`| Вспомогательный модуль для управляющего скрипта, содержащий необходимые функции|
+
+# Настройка перед запуском
+
+Все параметры для запуска находятся в файле `control.ini`. В этом файле параметры поделены на секции. Первая секция `datasets` отвечает за общие параметры для всех датасетов такие? как путь к папке, где будет унифицированный, преобразованный и расширенный датасет и путь к локальной директории, где хранятся временные файлы. Пример:
+
 ```ini
     [datasets]
-    output_path = <...>
-    local_path = <...>
+    output_path = Data/output_dir
+    local_path = Data/local
 ```
-The *output_path* parameter stores the path where the converted data will be saved. The *local_path* parameter is the path to the directory where the temporary script files will be stored. This parameter is needed if there are several datasets and a script that converts one dataset into another re-creates the directories, thereby deleting the files that were in the *output_path* folder. The converted dataset will be copied to the temporary folder, files that have the same name will be renamed. 
 
-------------
-The following N sections store parameters for specific datasets, where N is the number of datasets.
+Далее "добавляем" датасет в наш рабочий процесс. Для этого добавляем секцию `data_NAME`, где `NAME` - название датасета (Только буквами и цифрами. Без пробелов).
+
+В этой секции 4 параметра. Первый параметр `name` нужен для того, чтобы вывести в консоль сообщение о том, какой именно датасет конвертируется (этот параметр необходим для удобства чтения логов). Параметр `path_to_datasets` содержит путь к набору данных. `Script_to_convert` содержит путь к скрипту, который конвертирует данный датасет в формат PASCAL VOC. Параметр `enabled` указывает, следует ли использовать этот набор данных (Если false, то датасет игнорируется и не используется). Секцию `data_NAME` можно дублировать с разными параметрами, тем самым добавляя разные датасеты. 
+Пример:
 
 ```ini
-    [data_name]
-    name = <...>
-    path_to_dataset = <...>
-    script_to_convert = <...>
-```
-[data_name] is name of section (``name'' is the user-defined custom name.).
-Example: 
-```ini
-    [datasets]
-    output_path = data/out
-    local_path = data/local
-    
-    [data_icdar2017]
-    name = ICDAR 2017
-    path_to_dataset = data/icdar2017
-    script_to_convert = scripts/icdar2017_to_pascalvoc/main.py
-    enabled = true
-    
-    [data_marmot]
-    name = Marmot
-    path_to_dataset = data/marmot
+    [data_Marmot]
+    name = Marmot dataset
+    path_to_dataset = Data/Marmot
     script_to_convert = scripts/marmot_to_pascalvoc/main.py
-    enabled = true
-```
-Inside the *data_name* section there are three parameters: *name*, *path_to_datasets*, *script_to_convert*. The *name* parameter is needed in order to display a message on the console exactly which data is converted (this parameter is necessary for the convenience of reading logs). The *path_to_datasets* parameter stores the path to dataset. The *script_to_convert* contains the path to the script that converts datasets. The *enabled* parameter indicates whether or not to use this dataset.
 
-The next section is *image_transform*. This section contains options for image conversion.
-```ini
-    [image_transform]
-    script_to_transform = <...> 
+    [data_Icdar2017]
+    name = ICDAR2017 dataset
+    path_to_dataset = Data/ICDAR2017
+    script_to_convert = scripts/icdar2017_to_pascalvoc/main.py
 ```
-The path to the script that converts the image is written to the *script_to_transform* parameter.
-Example: 
+
+Следующий раздел - `image_transform`. Этот раздел содержит параметр преобразования изображений `script_to_transform`, который содержит путь к скрипту.
+Пример:
+
 ```ini
     [image-transform]
     script_to_transform = scripts/image_transform/main.py
 ```
-------------
-The *tuning_transform* section contains parameters for running a script that will perform data augmentation.
-```ini
-    [tuning_transform]
-    script_to_tuning = <...>
-```
-In the parameter *script_to_tuning* the script is specified that will make the data augmentation.
-Example: 
+
+Раздел `tuning_transform` содержит параметр для запуска сценария, который будет выполнять аугментацию данных. Этот параметр содержит путь к скрипту.
+Пример:
+
 ```ini
     [tuning_transform]
     script_to_tuning = scripts/augmentation_data/main.py
 ```
-------------
-The last section is *records*. This section contains the parameters for running the script that creates input files of the record type.
-```ini
-    [records]
-    script_to_create_tf_records = <...>
-    path_to_output = <...>
-    path_to_label_map = <...>
-```
-The parameter *path_to_output* stores the path to the folder where to save the record type files. The *path_to_label_map* stores the path to *label_map.pbtxt* file. The *label_map.pbtxt* file contains the name and ID of the classes,it is necessary to learn to recognize.
-Example: 
+
+Последний раздел - `records`. В этом разделе содержатся параметры для запуска скрипта, создающего входные файлы для нейронной сети типа TF Records.
+
+Параметр `path_to_output` содержит путь к папке, в которой следует сохранять файлы типа записи. `Path_to_label_map` содержит путь к файлу `label_map.pbtxt`. Файл `label_map.pbtxt` содержит название и ID классов, которые необходимо научиться распознавать.
+Пример:
+
 ```ini
     [records]
     script_to_create_tf_records = scripts/create_table_tf_record/create_tf_record.py
-    path_to_output = data/out/rec
-    path_to_label_map = data/label_map.pbtxt
+    path_to_output = Data/output_dir_rec
+    path_to_label_map = Data/label_map.pbtxt
 ```
 
-------------
-It is also possible to use links to parameters *output_path*, *local_path*. To do this, write the parameters in curly braces. 
-For example:
-```ini
-    [datasets]
-    output_path = data/out
-    local_path = local/temp
-    
-    ...
-    
-    [records]
-    script_to_create_tf_records = scripts/create_table_tf_record/create_tf_record.py
-    path_to_output = {output_path}
-    path_to_label_map = data/label_map.pbtxt
+Если данные не нуждаются в каком-либо шаге (аугментация, конвертация и т.д.) и этот шаг нужно пропустить, то нужно в параметре `script_to_*` указать пустой путь к скрипту. Однако если указать пустой путь к датасету, то скрипт остановится с ошибкой.
+
+# Запуск проекта
+
+Для запуска проект нужно запустить `main.py` файл в любом ide под python. Если файл конфигурации расположен в той же директории, что и скрипт, то скрипт будет выполнять свою задачу в обычном режиме, в противном случае скрипт сгенерирует пустой файл конфигурации для дальнейшего заполнения пользователем.
+
+## Коды ошибок
+
+Скрипт может аварийно завершить выполнения по ряду причин. 
+
+| Код ошибки  | Описание проблемы |
+| ------------------ | ---------- |
+| 1 | Путь к скрипту или не существует, или указан неверно. |
+| 2 | Путь к директории указан неверно. Управляющий скрипт в выводе сообщит где именно (в какой секции config.ini файла) путь указан неверно. |
+| 3 | Скрипт, который был запущен управляющем, завершился с ошибкой. Например, скрипт аугментации или конвертации. Управляющий скрипт в выводе сообщит о коде ошибки скрипта |
+| 4 | Ошибка вспомогательного модуля. |
+
+Об *успешном* окончании работы скрипт сообщит в выводе фразой "Script finished. File's train.record, val.record were created"
+
+# Добавление своего датасета
+
+Для добавления своего датасета необходимо написать скрипт для конвертации в формат PASCAL VOC.
+
+## Особенность формата PASCAL VOC
+
+PASCAL VOC - это формат, который представляет собой директорию с изображениями и с XML файлами. Также в этом формате присутствует файл trainval.txt, в котором хранятся названия всех файлов.
+
+XML файлы хранят некоторую информацию о классе, который нужно распознать. Они хранят название файла (изображения), ширину и высоту изображения, параметр depth, параметр segmented и коллекцию объектов. В этой коллекции хранится название класса и координаты xmin, xmax, ymin, ymax. Эти координаты описывают, так называемую, область интереса (левый верхний край и нижний правый край).
+
+Пример XML файла:
+
+```xml
+<annotation>
+    <filename>cTDaR_s001.jpg</filename>
+    <size>
+        <width>4696</width>
+        <height>3746</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>table</name>
+        <bndbox>
+            <xmin>38</xmin>
+            <ymin>36</ymin>
+            <xmax>4575</xmax>
+            <ymax>3687</ymax>
+        </bndbox>
+    </object>
+</annotation>
 ```
-The script will automatically replace the references to the path specified in the specified parameters.
+
+## Скрипт по конвертации
+
+Скрипт по конвертации должен записать данные размеченной области в XML файл в соответствии  с форматом PASCAL VOC (XML файлы хранятся в папке "annotations/xmls"). Также необходимо записать в файл trainval.txt названия файлов через знак переноса.
+
+```xml
+POD_0001tuned_0
+POD_0001tuned_1
+POD_0001tuned_2
+```
+
+Запуск скрипта осуществляется с помощью двух параметров запуска: входная директория с датасетом, директория сохранения нового датасета. Параметры определяются `-i <input folder>` и `-o <output folder>` соответственно.
+
+Код для корректного (для данного проекта) чтения параметров:
+
+```python
+import getopt
+import sys
+
+argv = sys.argv[1:]
+
+try:
+    opts, args = getopt.getopt(argv, "hi:o:", ["input_folder=", "output_folder="])
+except getopt.GetoptError:
+    print('test.py -i <input folder> -o <output folder>')
+    sys.exit(2)
+for opt, arg in opts:
+    if opt in ("-i", "--i"):
+        input_path = arg
+    elif opt in ("-o", "--o"):
+        output_path = arg
+```
