@@ -1,6 +1,6 @@
 import os
 import cv2
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import xml.etree.ElementTree as ET
 import copy
 import shutil
