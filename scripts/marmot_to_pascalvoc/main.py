@@ -50,8 +50,6 @@ def main(argv):
     os.makedirs(xmls_path)
 
     images = dict()
-
-    print("save_images from " + input_folder)
     for dir_name, sub_dir_list, file_list in os.walk(input_folder):
         for file_name in fnmatch.filter(file_list, "*.bmp"):
             path = os.path.join(dir_name, file_name)
@@ -76,7 +74,6 @@ def main(argv):
                 continue
 
             pascal_voc_name = os.path.join(xmls_path, file_name)
-            print(pascal_voc_name)
             pascal_voc.write(open(pascal_voc_name, 'w'), encoding='unicode')
             trainval_file.write(name + "\n")
 
