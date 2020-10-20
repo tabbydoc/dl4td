@@ -47,9 +47,6 @@ def main(_):
               (1, 0.8), (1, 0.9), (1, 1.1), (1, 1.2)]
 
     for file in files:
-
-        print(file)
-
         image_name = os.path.join(image_dir, file + '.jpeg')
         image = cv2.imread(image_name)
         new_image_name = os.path.join(out_image_dir, file + '.jpeg')
@@ -61,7 +58,6 @@ def main(_):
         count = 0
 
         for scale in scales:
-
             suffix = 'tuned_' + str(count)
             o_examples.write(file + suffix + '\n')
 
@@ -99,10 +95,9 @@ def main(_):
                 ymax = float(object_ymax.text)
                 ymax = int(ymax * scale[1])
                 object_ymax.text = str(ymax)
-
+                
             new_annotation_name = os.path.join(out_xmls_path, file + suffix + '.xml')
             new_xml_tree.write(new_annotation_name)
-
             count += 1
 
 
