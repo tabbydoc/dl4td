@@ -49,7 +49,6 @@ FLAGS = flags.FLAGS
 print(FLAGS.data_dir)
 print(FLAGS.output_dir)
 print(FLAGS.label_map_path)
-print('###################')
 ignore_msg = 0
 delete_data = 0
 def dict_to_tf_example(data,
@@ -156,9 +155,8 @@ def create_tf_record(output_filename,
       xml_str = fid.read()
     xml = etree.fromstring(xml_str)
     data = dataset_util.recursive_parse_xml_to_dict(xml)['annotation']
-    print(example)
+    # print(example)
     local_path = os.path.join(image_dir, example + ".jpeg")
-    #print(local_path)
     if ignore_msg == 0:
         tf_example = dict_to_tf_example(data, label_map_dict, image_dir)
         writer.write(tf_example.SerializeToString())
@@ -179,15 +177,10 @@ def create_tf_record(output_filename,
 def main(_):
   data_dir = FLAGS.data_dir
   label_map_path = os.path.join(data_dir, FLAGS.label_map_path)
-  print(data_dir)
-  print(label_map_path)
   label_map_dict = label_map_util.get_label_map_dict(label_map_path)
   image_dir = os.path.join(data_dir, 'images')
-  print(image_dir)
   annotations_dir = os.path.join(data_dir, 'annotations')
-  print(annotations_dir)
   examples_path = os.path.join(annotations_dir, 'trainval.txt')
-  print("-------- " + data_dir + " is " + str(os.path.exists(data_dir)))
   examples_list = dataset_util.read_examples_list(examples_path)
 
   # Test images are not included in the downloaded data set, so we shall perform
@@ -203,8 +196,6 @@ def main(_):
 
   train_output_path =  os.path.join(FLAGS.output_dir, 'train.record')
   val_output_path =  os.path.join(FLAGS.output_dir, 'val.record')
-  print("IMAGEDIR - " + image_dir)
-  print("ANNONTDIR - " + annotations_dir)
   create_tf_record(train_output_path, label_map_dict, annotations_dir,
                    image_dir, train_examples)
   create_tf_record(val_output_path, label_map_dict, annotations_dir,
