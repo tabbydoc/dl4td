@@ -104,7 +104,7 @@ def error_message(error_type, text, text2, text3):
 
 if __name__ == "__main__":
     print(colored('\n Starting the script', 'blue', attrs=['bold']) + '\n')
-    path = "config.ini"
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.ini")
     regex_out = "{output_path}"
     regex_loc = "{local_path}"
     if sys.version_info[0] < 3:
