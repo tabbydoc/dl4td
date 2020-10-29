@@ -26,7 +26,7 @@ def main(argv):
         elif opt in ("-i", "--i"):
             input_folder = arg
         elif opt in ("-o", "--o"):
-            output_folder = arg
+            output_folder = os.path.join(arg, 'images')
 
     is_dir = os.path.isdir(input_folder)
 
