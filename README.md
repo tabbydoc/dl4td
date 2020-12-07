@@ -1,5 +1,6 @@
 Документация к DL4TD
 ======
+[Ссылка на ноутбук в Google colab](https://colab.research.google.com/drive/1TDoXxlxGhrbeZfkID5xK0DNK7ikicbZC)
 
 # О проекте
 
