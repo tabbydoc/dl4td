@@ -91,7 +91,6 @@ for line in ignore_file:
     ignore_list.append(line.replace('\n', ''))
 ignore_file.close()
 
-# sys.exit(0)
 for root, dirs, files in os.walk(work_directory_pdf):
     for file in files:
         if file in skip_file_list:
@@ -101,21 +100,21 @@ for root, dirs, files in os.walk(work_directory_pdf):
             continue
         pages = convert_from_path(os.path.join(work_directory_pdf, file))
         print(file)
-        pages[0].save(data_out + "\\images\\" + file[:-4] + ".jpeg", 'JPEG')
+        pages[0].save(data_out + "\\images\\" + str(file[:-4]) + ".jpeg", 'JPEG')
 
         if not _noImage:
-            image = os.path.join(data_out, "images", file[:-4] + ".jpeg")
+            image = os.path.join(data_out, "images", str(file[:-4]) + ".jpeg")
             print(image)
             img = Image.open(image)
 
             img1 = ImageDraw.Draw(img)
-        chun = codecs.open(work_directory_chunk + '\\' + file[:-4] + '.chunk', 'r', encoding='utf-8')
-        struct = codecs.open(work_directory_structure + '\\' + file[:-4] + '.json', 'r', encoding='utf-8')
+        chun = codecs.open(work_directory_chunk + '\\' + str(file[:-4]) + '.chunk', 'r', encoding='utf-8')
+        struct = codecs.open(work_directory_structure + '\\' + str(file[:-4]) + '.json', 'r', encoding='utf-8')
 
         trainval.write(str(file[:-4]) + '\n')
 
-        log = open('F:\\Proj\\Python\\Sctisr\\data\\logs_test\\' + file[:-4] + '.txt', 'w')
-        log.write(file + '\n')
+        log = open('F:\\Proj\\Python\\Sctisr\\data\\logs_test\\' + str(file[:-4]) + '.txt', 'w')
+        log.write(str(file) + '\n')
         minx = w_img
         miny = h_img
         maxx = 0
@@ -123,7 +122,6 @@ for root, dirs, files in os.walk(work_directory_pdf):
         skip = False
         if debug:
             log.write(str(chun) + '\n')
-            # print(chun)
 
         chunks = json.load(chun)['chunks']
         structures = json.load(struct)['cells']
@@ -136,7 +134,7 @@ for root, dirs, files in os.walk(work_directory_pdf):
         if not skip:
             # print(file, ' =?= ', line[:-1])
             for i in range(len(ignore_list)):
-                if file in ignore_list[i]:
+                if str(file) in ignore_list[i]:
                     skip = True
                     print('skip')
                     log.write('= skip; In ignore list')
@@ -163,13 +161,6 @@ for root, dirs, files in os.walk(work_directory_pdf):
                 log.write(str(chunk["pos"][2]) + '\n')
                 log.write(str(chunk["pos"][3]) + '\n')
                 log.write(str(LatexNodes2Text().latex_to_text(chunk["text"]).encode('utf-8')) + '\n')
-                """
-                print(chunk["pos"][0])
-                print(chunk["pos"][1])
-                print(chunk["pos"][2])
-                print(chunk["pos"][3])
-                print(LatexNodes2Text().latex_to_text(chunk["text"]))
-                """
             if not _noImage:
                 clr = random.randrange(0, 256)
 
@@ -217,9 +208,6 @@ for root, dirs, files in os.walk(work_directory_pdf):
                     str2 = delete_exc_char(str2_).encode('ascii', errors='ignore')
                     if debug:
                         log.write(str(str1) + ' ?= ' + str(str2) + '\n')
-                        # print(str1, ' ?= ', str2)
-
-                    # if str2 != '' and (str1 == str2 or re.findall(str2, str1)):
                     if str2 != b'' and (str1 == str2):
                         find = True
                         structures.pop(i)
@@ -231,18 +219,15 @@ for root, dirs, files in os.walk(work_directory_pdf):
                         find = True
                         structures.pop(i)
                         if debug:
-                            # print('YEs')
                             log.write('YEs' + '\n')
                         break
                     elif (str1 == b'' and str2 == b'') and (str1_ == str2_):
                         find = True
                         structures.pop(i)
                         if debug:
-                            # print('YEs')
                             log.write('YEs' + '\n')
                         break
                     if debug:
-                        # print('NO')
                         log.write('NO' + '\n')
             if find or skip:
                 if minx > chunk["pos"][0]:
@@ -278,7 +263,7 @@ for root, dirs, files in os.walk(work_directory_pdf):
         else:
             ymax.text = str(int(h_img - miny * (h_img / h) + shift))
 
-        ElementTree(rootTree).write(open(os.path.join(annotation_xml_out, file[:-3] + "xml"), 'w'), encoding='unicode')
+        ElementTree(rootTree).write(open(os.path.join(annotation_xml_out, str(file[:-3]) + "xml"), 'w'), encoding='unicode')
 
         if not _noImage:
             img1.rectangle([minx * (w_img / w) - shift, h_img - miny * (h_img / h) + shift, maxx * (w_img / w) + shift,
@@ -287,7 +272,7 @@ for root, dirs, files in os.walk(work_directory_pdf):
         chun.close()
         struct.close()
         if not _noImage:
-            img.save(data_out + "\\annotations\\" + file[:-4] + ".jpeg")
+            img.save(data_out + "\\annotations\\" + str(file[:-4]) + ".jpeg")
 
         if debug:
             # print('')

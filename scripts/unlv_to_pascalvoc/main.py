@@ -62,9 +62,9 @@ def main(argv):
             save_path = os.path.join(images_path, name + ".jpeg")
             img = cv2.imread(path)
             height, width, channels = img.shape
-            #if width > 2000 or height > 2000:
+            # if width > 2000 or height > 2000:
             #    img = cv2.resize(img, (0, 0), fx=0.5, fy=0.5)
-            #img = transform_image(img)
+            # img = transform_image(img)
             cv2.imwrite(save_path, img)
             images[name] = {"width": width, "height": height}
 

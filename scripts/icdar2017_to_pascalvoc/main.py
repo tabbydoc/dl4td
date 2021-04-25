@@ -109,11 +109,11 @@ def process_file(path, images):
         xmin = ET.SubElement(bndbox, "xmin")
         xmin.text = str(rect.l)
         ymin = ET.SubElement(bndbox, "ymin")
-        #fymin = images[name].get("height") - rect.d
+        # fymin = images[name].get("height") - rect.d
         ymin.text = str(rect.u)
         xmax = ET.SubElement(bndbox, "xmax")
         xmax.text = str(rect.r)
-        #fymax = images[name].get("height") - rect.d
+        # fymax = images[name].get("height") - rect.d
         ymax = ET.SubElement(bndbox, "ymax")
         ymax.text = str(rect.d)
 

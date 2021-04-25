@@ -17,9 +17,9 @@ pip install -r requirements.txt
 ```
 
 После этого нужно установить на свою машину фреймворк TF Object Detection.
-> Версия TensorFlow должна быть 1.5.x
 
 [Установка Object Detection на Windows 10](https://medium.com/@marklabinski/installing-tensorflow-object-detection-api-on-windows-10-7a4eb83e1e7b)
+
 [Установка OD и некоторых компонентов](https://tensorflow-object-detection-api-tutorial.readthedocs.io/en/latest/install.html#)
 
 # Структура проекта (в GitHub'e)

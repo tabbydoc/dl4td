@@ -4,10 +4,10 @@ import fnmatch
 import getopt
 import cv2
 from PIL import Image
-#import curses
+# import curses
+# myscreen = curses.initscr()
+# myscreen.border(0)
 
-#myscreen = curses.initscr()
-#myscreen.border(0)
 
 def main(argv):
     input_folder = ''

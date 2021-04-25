@@ -1,8 +1,5 @@
 import os
-import shutil
 import subprocess
-import xml.etree.ElementTree as ET
-import copy
 import configparser
 from termcolor import colored
 from sys import argv
@@ -21,7 +18,6 @@ _skip_tun = 0
 _skip_transform = 0
 _skip_data = 0
 _slash = os.sep
-_train = 0
 _skip_this = 0
 
 try:
@@ -34,71 +30,65 @@ except IndexError:
 
 # Function to create a config.ini file
 def create_config(path_config):
-    """
-    Create a config file
-    """
-    config = configparser.ConfigParser()
-    config.add_section("settings")
-    config.set("settings", "train", "no")
+    config_f = configparser.ConfigParser()
 
-    config.add_section("datasets")
-    config.set("datasets", "output_path", "")
-    config.set("datasets", "local_path", "")
+    config_f.add_section("datasets")
+    config_f.set("datasets", "output_path", "")
+    config_f.set("datasets", "local_path", "")
 
-    config.add_section("data_name")
-    config.set("data_name", "name", "")
-    config.set("data_name", "path_to_dataset", "")
-    config.set("data_name", "script_to_convert", "")
-    config.set("data_name", "enabled", "true")
+    config_f.add_section("data_name")
+    config_f.set("data_name", "name", "")
+    config_f.set("data_name", "path_to_dataset", "")
+    config_f.set("data_name", "script_to_convert", "")
+    config_f.set("data_name", "enabled", "true")
 
-    config.add_section("image_transform")
-    config.set("image_transform", "script_to_transform", "")
+    config_f.add_section("image_transform")
+    config_f.set("image_transform", "script_to_transform", "")
 
-    config.add_section("tuning_image")
-    config.set("tuning_image", "script_to_tuning", "")
+    config_f.add_section("tuning_image")
+    config_f.set("tuning_image", "script_to_tuning", "")
 
-    config.add_section("records")
-    config.set("records", "script_to_create_tf_records", "")
-    config.set("records", "path_to_output", "")
-    config.set("records", "path_to_label_map", "")
+    config_f.add_section("records")
+    config_f.set("records", "script_to_create_tf_records", "")
+    config_f.set("records", "path_to_output", "")
+    config_f.set("records", "path_to_label_map", "")
 
     with open(path_config, "w") as config_file:
-        config.write(config_file)
+        config_f.write(config_file)
         print(colored(" File " + path_config + " was created!", "blue"))
 
 
 # Replacing the words {output_path} and {local_path} with the appropriate path.
-def replace_string(str):
-    if re.findall(regex_out, str):
-        return re.sub(regex_out, output_dir, str, count=0)
-    elif re.findall(regex_loc, str):
-        return re.sub(regex_loc, local_dir, str, count=0)
-    else:
-        return str
+def replace_string(string):
+    if re.findall(regex_out, string):
+        return re.sub(regex_out, output_dir, string, count=0)
+    elif re.findall(regex_loc, string):
+        return re.sub(regex_loc, local_dir, string, count=0)
+    return string
 
 
 # Error call function
-def error_message(error_type, text, text2, text3):
+def error_message(error_type, text):
     if error_type == 0:
-        print(colored('ERROR! File ' + text + ' not found!', 'red', attrs=['reverse', 'bold']))
+        print(colored('ERROR! File ' + text[0] + ' not found!', 'red', attrs=['reverse', 'bold']))
     elif error_type == 3:
-        print(colored('ERROR! Process ' + text + ' finished with exit code ' + str(text2), 'red',
+        print(colored('ERROR! Process ' + text[0] + ' finished with exit code ' + str(text[1]), 'red',
                       attrs=['reverse', 'bold']))
         raise SystemExit(3)
     elif error_type == 2:
-        print(colored('ERROR! Folder ' + text + ' not found!', 'red', attrs=['reverse', 'bold']))
+        print(colored('ERROR! Folder ' + text[0] + ' not found!', 'red', attrs=['reverse', 'bold']))
         print(colored(
-            "Proposal: Enter the correct path ('" + text2 + "') in the [" + text3 + "] section of the config.ini file.",
-            'yellow'))
+            "Proposal: Enter the correct path ('" + text[1] + "') in the [" + text[2] + "] section of the config.ini "
+                                                                                        "file.", 'yellow'))
         raise SystemExit(2)
     elif error_type == 1:
-        print(colored('ERROR! Script ' + text + ' not found!', 'red', attrs=['reverse', 'bold']))
+        print(colored('ERROR! Script ' + text[0] + ' not found!', 'red', attrs=['reverse', 'bold']))
         print(colored(
-            "Proposal: Enter the correct path ('" + text2 + "') in the [" + text3 + "] section of the config.ini file.",
-            'yellow'))
+            "Proposal: Enter the correct path ('" + text[1] + "') in the [" + text[2] + "] section of the config.ini "
+                                                                                        "file.", 'yellow'))
         raise SystemExit(1)
     elif error_type == 4:
-        print(colored('ERROR! Module  ' + text + ' return -1', 'red', attrs=['reverse', 'bold']))
+        print(colored('ERROR! Module  ' + text[0] + ' return -1', 'red', attrs=['reverse', 'bold']))
         raise SystemExit(4)
 
 
@@ -113,18 +103,12 @@ if __name__ == "__main__":
         python_ver = "python"
 
     if not os.path.exists(path):
-        error_message(0, path, '', '')  # ERROR
+        error_message(0, [path])  # ERROR
         create_config(path)
     else:
         # Reading parameters from a file and preparing the output directory.
         config = configparser.ConfigParser()
         config.read(path)
-        if config.get("settings", 'train').upper() == 'NO':
-            _train = 0
-        elif config.get("settings", 'train').upper() == 'YES':
-            _train = 1
-        if _debug == 1:
-            print(colored(' TRAIN - ' + str(_train), 'yellow'))
 
         print(colored(' - datasets -', 'blue'))
         output_dir = config.get("datasets", 'output_path')
@@ -144,12 +128,7 @@ if __name__ == "__main__":
             shutil.rmtree(images_path)
         if os.path.exists(xmls_path):
             shutil.rmtree(xmls_path)
-        if os.path.exists(os.path.join(output_dir, "annotations")):
-            shutil.rmtree(os.path.join(output_dir, "annotations"), ignore_errors=True)
-        if os.path.exists(os.path.join(os.path.join(output_dir, "annotations"), "xmls")):
-            shutil.rmtree(os.path.join(os.path.join(output_dir, "annotations"), "xmls"), ignore_errors=True)
-        if os.path.exists(os.path.join(output_dir, "images")):
-            shutil.rmtree(os.path.join(output_dir, "images"), ignore_errors=True)
+        remove_inside(output_dir)
 
         os.makedirs(images_path)
         os.makedirs(annotations_path)
@@ -157,16 +136,15 @@ if __name__ == "__main__":
 
         if not os.path.exists(os.path.join(output_dir, "annotations")):
             os.mkdir(os.path.join(output_dir, "annotations"))
-        if not os.path.exists(os.path.join(os.path.join(output_dir, "annotations"), "xmls")):
-            os.mkdir(os.path.join(os.path.join(output_dir, "annotations"), "xmls"))
+        if not os.path.exists(os.path.join(output_dir, "annotations", "xmls")):
+            os.mkdir(os.path.join(output_dir, "annotations", "xmls"))
         if not os.path.exists(os.path.join(output_dir, "images")):
             os.mkdir(os.path.join(output_dir, "images"))
 
         if _debug == 1:
             print(colored(' annotations (local) - ' + xmls_path + ' -> ' + str(os.path.exists(xmls_path)), 'yellow'))
-            print(colored(' annotations (output data) - ' + os.path.join(os.path.join(output_dir, "annotations"),
-                                                                         "xmls") + ' -> ' + str(
-                os.path.exists(os.path.join(os.path.join(output_dir, "annotations"), "xmls"))), 'yellow'))
+            print(colored(' annotations (output data) - ' + os.path.join(output_dir, "annotations", "xmls") + ' -> ' +
+                          str(os.path.exists(os.path.join(output_dir, "annotations", "xmls"))), 'yellow'))
 
         # Read all datasets from the config.ini file
         dataset_list = []
@@ -181,6 +159,8 @@ if __name__ == "__main__":
             _skip_this = 0
             script = config.get(dataset_name, 'script_to_convert')
             data_dir = config.get(dataset_name, 'path_to_dataset')
+            if not os.path.exists(data_dir):
+                error_message(2, [data_dir, "path_to_dataset", dataset_name])
             enabled = config.get(dataset_name, "enabled")
             if enabled.upper() == "YES" or enabled.upper() == "TRUE":
                 if os.path.exists(script) or script == "":
@@ -189,31 +169,23 @@ if __name__ == "__main__":
                               colored('-i ' + data_dir + ' -o ' + output_dir, 'blue') + '\n')
                         code = subprocess.call([python_ver, script, '-i' + data_dir, '-o' + output_dir, '', ''])
                         if code != 0:
-                            error_message(3, script, code, '')
+                            error_message(3, [script, code])
                     else:
                         print(colored(' -Skip (script_to_convert is empty)-', 'yellow') + '\n')
                         _skip_data += 1
                         _skip_this = 1
-                        print(os.path.exists(data_dir + _slash + 'annotations' + _slash + 'xmls'))
 
-                        if os.path.exists(os.path.join(output_dir, "annotations")):
-                            shutil.rmtree(os.path.join(output_dir, "annotations"), ignore_errors=True)
-                        if os.path.exists(os.path.join(os.path.join(output_dir, "annotations"), "xmls")):
-                            shutil.rmtree(os.path.join(os.path.join(output_dir, "annotations"), "xmls"), ignore_errors=True)
-                        if os.path.exists(os.path.join(output_dir, "images")):
-                            shutil.rmtree(os.path.join(output_dir, "images"), ignore_errors=True)
-
+                        remove_inside(output_dir)
                         try:
-                            # transform(data_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
                             if len(dataset_list) > 1:
                                 move_files(data_dir, _debug, xmls_path, images_path)
                             else:
                                 transform(data_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
                         except RuntimeError:
-                            error_message(4, 'transform', '', '')
+                            error_message(4, ['transform'])
 
                 else:
-                    error_message(1, script, 'script_to_convert. Enabled = false', dataset_name)  # ERROR
+                    error_message(1, [script, 'script_to_convert. Enabled = false', dataset_name])  # ERROR
                 if len(dataset_list) > 1:
                     print(dataset_list)
                     if _skip_this == 0:
@@ -223,13 +195,13 @@ if __name__ == "__main__":
             else:
                 print(colored(' -Skip (enabled = false)-', 'yellow') + '\n')
         if len(dataset_list) > 1:
-            shutil.rmtree(output_dir + _slash + 'annotations', ignore_errors=True)
-            shutil.rmtree(output_dir + _slash + 'images', ignore_errors=True)
+            shutil.rmtree(os.path.join(output_dir, 'annotations'), ignore_errors=True)
+            shutil.rmtree(os.path.join(output_dir, 'images'), ignore_errors=True)
             print(colored(' - Some data conversions -', 'blue'))
             try:
                 transform(local_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
             except RuntimeError:
-                error_message(4, 'transform', '', '')
+                error_message(4, ['transform'])
 
         # Run image transforming
         print(colored(" - Image Transform - ", 'blue'))
@@ -241,12 +213,12 @@ if __name__ == "__main__":
                       colored('-i ' + data_dir + ' -o ' + output_dir, 'blue') + '\n')
                 code = subprocess.call([python_ver, script, '-i' + data_dir, '-o' + output_dir])
                 if code != 0:
-                    error_message(3, script, code, '')
+                    error_message(3, [script, code])
             else:
                 print(colored(' -Skip-', 'yellow') + '\n')
                 _skip_transform = 1
         else:
-            error_message(1, script, 'script_to_transform', 'image-transform')  # ERROR
+            error_message(1, [script, 'script_to_transform', 'image-transform'])  # ERROR
 
         # Run data tuning
         print(colored(" - Tuning Image - ", 'blue'))
@@ -258,12 +230,12 @@ if __name__ == "__main__":
                       colored('--data_dir=' + data_dir + ' --output_dir=' + local_dir, 'blue') + '\n')
                 code = subprocess.call([python_ver, script, '--data_dir=' + data_dir, '--output_dir=' + local_dir])
                 if code != 0:
-                    error_message(3, script, code, '')
+                    error_message(3, [script, code])
             else:
                 print(colored(' -Skip-', 'yellow') + '\n')
                 _skip_tun = 1
         else:
-            error_message(1, script, 'script_to_tuning', 'tuning-image')  # ERROR
+            error_message(1, [script, 'script_to_tuning', 'tuning-image'])  # ERROR
         if _skip_tun != 1:
 
             if os.path.exists(os.path.join(output_dir, 'images')):
@@ -276,7 +248,7 @@ if __name__ == "__main__":
                 transform(local_dir, output_dir, 'annotations' + _slash + 'xmls', 'images', 2)
                 # move_files(local_dir, _debug, xmls_path, images_path)
             except RuntimeError:
-                error_message(4, 'transform', '', '')
+                error_message(4, ['transform'])
 
         print(colored(' - delete excess data -' + output_dir, 'blue'))
         delete_excess(output_dir)
@@ -296,31 +268,11 @@ if __name__ == "__main__":
                 code = subprocess.call([python_ver, script, '--data_dir=' + data_dir, '--output_dir=' + output_path,
                                         '--label_map_path=' + label_map_path])
                 if code != 0:
-                    error_message(3, script, code, '')
+                    error_message(3, [script, code])
             else:
                 print(colored(' -Skip-', 'yellow') + '\n')
         else:
-            error_message(1, script, 'script_to_create_tf_records', 'records')  # ERROR
-
-        # if os.path.exists(os.path.join(local_dir, 'images')):
-        #    shutil.rmtree(os.path.join(local_dir, 'images'))
-        # if os.path.exists(os.path.join(local_dir, 'annotations')):
-        #    shutil.rmtree(os.path.join(local_dir, 'annotations'))
-
-        if _train == 1:
-            script = config.get('train', 'script_to_train')
-            train_dir = config.get('train', 'train_dir')
-            pipeline_config_path = config.get('train', 'pipeline_config_path')
-            print(colored(" - Training - ", 'blue'))
-            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-            print(colored(
-                'Running script' + script + ' --logtostderr --train_dir=' + train_dir + '--pipeline_config_path' +
-                pipeline_config_path, 'blue'))
-            code = subprocess.call(
-                [python_ver, script, '--logtostderr', '--train_dir=' + train_dir, '--pipeline_config_path' +
-                 pipeline_config_path])
-            if code != 0:
-                error_message(3, script, code, '')
+            error_message(1, [script, 'script_to_create_tf_records', 'records'])  # ERROR
 
         print(colored('\n Script finished', 'blue', attrs=['bold']))
         print(colored("File's train.record, val.record were created", 'blue', attrs=['bold']))

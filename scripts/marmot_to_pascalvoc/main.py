@@ -16,7 +16,6 @@ def main(argv):
     output_folder = 'out'
     try:
         opts, args = getopt.getopt(argv, "hi:o:", ["input_folder=", "output_folder="])
-        #print(os.path.isdir(input_folder))
     except getopt.GetoptError:
         print('test.py -i <input folder> -o <output folder>')
         sys.exit(2)
@@ -97,7 +96,7 @@ def process_file(path, images):
     marmot_root = marmot_tree.getroot()
 
     tables = marmot_root.findall("*/Composites/*[@Label='TableBody']")
-    
+
     if not tables:
         return None
 
